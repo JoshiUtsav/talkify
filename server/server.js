@@ -4,7 +4,7 @@ const http = require("http");
 const express = require("express");
 const socketIo = require("socket.io");
 
-
+const { generateMessage } = require('./utils/message')
 const publicPath = path.join(__dirname, "/../public");
 const port = process.env.PORT || 80;
 const app = express();
@@ -17,25 +17,14 @@ app.use(express.static(publicPath));
 io.on('connection', (socket) => {
     console.log("new user joined");
 
-    socket.emit('newMessage', {
-        from: 'Admin',
-        text: 'Welcome to my room',
-        createdAt: new Date().getTime()
-    })
+    socket.emit('newMessage', generateMessage("Admin", "Welcom to my chat room"))
 
-    socket.broadcast.emit('newMessage', {
-        from: 'Admin',
-        text: 'New User Joined',
-        createdAt: new Date().getTime()
-    })
+    socket.broadcast.emit('newMessage', generateMessage("Admin", "New User Joined"))
 
-    socket.on("createMessage", message => {
+    socket.on("createMessage", (message, callback) => {
         console.log("createMessage", message);
-        io.emit('newMessage', {
-            from:  message.from,
-            text: message.text,
-            createdAt: new Date().getTime()
-        })
+        io.emit('newMessage', generateMessage(message.from, message.text));
+        callback('This is server')
     })
 
     socket.on('disconnect', () => {
