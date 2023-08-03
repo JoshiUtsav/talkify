@@ -8,7 +8,7 @@ function scrollToBottom() {
 socket.on('connect', function() {
   let searchQuery = window.location.search.substring(1);
   let params = JSON.parse('{"' + decodeURI(searchQuery).replace(/&/g, '","').replace(/\+/g, ' ').replace(/=/g,'":"') + '"}');
-
+  
   socket.emit('join', params, function(err) {
     if(err){
       alert(err);
