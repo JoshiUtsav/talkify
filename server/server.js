@@ -12,18 +12,19 @@ const app = express();
 const dotenv = env.config();
 let server = http.createServer(app);
 let io = socketIo(server);
-
 app.use(express.static(publicPath));
+
 
 io.on('connection', (socket) => {
     console.log("new user joined");
     socket.on('join', (params, callback) => {
-        if(!isRealString(params.name) || !isRealString(params.room)){
+        if (!isRealString(params.name) || !isRealString(params.room)) {
             callback('Name and room are required')
         }
-        socket.join(params.name)        
-        socket.emit('newMessage', generateMessage("Admin", `Welcome to my ${params.room}`))
-        socket.broadcast.emit('newMessage', generateMessage("Admin", "New User Joined"));
+
+        socket.join(params.room);
+        socket.emit('newMessage', generateMessage("Admin", `Welcome to my ${params.room}`));
+        socket.broadcast.to(params.room).emit('newMessage', generateMessage("Admin", "New User Joined"));
         callback();
     })
     socket.on("createMessage", (message, callback) => {
@@ -32,13 +33,12 @@ io.on('connection', (socket) => {
         callback('This is server')
     })
 
-    socket.on('createLocationMessage', function (coords) { io.emit('newLocationMessage', generateLocationMessage("Admin", coords.lat, coords.lng)) })
+    socket.on('createLocationMessage', function (coords) { io.emit('newLocationMessage', generateLocationMessage("Admin", coords.lat, coords.lng))})
 
     socket.on('disconnect', () => {
-        console.log("user was disconnected from server");
+        console.log("User Disconnected");
     });
 });
-
 
 server.listen(port, () => {
     console.log(`http://localhost/`);
