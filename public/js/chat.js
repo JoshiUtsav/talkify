@@ -1,4 +1,6 @@
 let socket = io();
+let input = document.querySelector("#text-message");
+let typingTimeout;
 
 function scrollToBottom() {
   let messages = document.querySelector('#messages').lastElementChild;
@@ -28,14 +30,18 @@ socket.on('updateUsersList', function (users) {
 
   users.forEach(function (user) {
     let li = document.createElement('li');
-    li.innerHTML = user;
+    let typing = document.createElement('span');
+    typing.setAttribute('id', "typing")
+    li.classList.add('user-typing')
+    li.innerText = user;
+    li.appendChild(typing);
     ol.appendChild(li);
   });
 
   let usersList = document.querySelector('#users');
   usersList.innerHTML = "";
   usersList.appendChild(ol);
-})
+});
 
 socket.on('newMessage', function (message) {
   const formattedTime = moment(message.createdAt).format('LT');
@@ -45,13 +51,20 @@ socket.on('newMessage', function (message) {
     text: message.text,
     createdAt: formattedTime
   });
-
+  
   const div = document.createElement('div');
   div.innerHTML = html
-
+  
   document.querySelector('#messages').appendChild(div);
   scrollToBottom();
 });
+
+input.addEventListener('keyup', function () {
+  let typing = document.getElementById('typing');
+  clearTimeout(typingTimeout);
+  typing.textContent = `typing...`;
+  typingTimeout = setTimeout(() => { typing.textContent = ''; }, 500);
+})
 
 socket.on('newLocationMessage', function (message) {
   const formattedTime = moment(message.createdAt).format('LT');
