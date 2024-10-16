@@ -1,5 +1,7 @@
 {
-  "name": "Talkify",
+  "name": "talkify",
+  "version": "0.0.1",
+  "description": "This is a chat application. where you can create room and talk anonimously.",
   "scripts": {
     "dev": "wrangler dev src/index.ts",
     "deploy": "wrangler deploy --minify src/index.ts"
